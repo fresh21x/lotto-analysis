@@ -1,9 +1,9 @@
 import pandas as pd
 from collections import defaultdict
+import random
 
-# Data from user: draw results
+# Your previous lotto data
 draw_data = [
-    (2025, 8, 3, [3, 11, 12, 18, 46], 12),
     (2025, 8, 2, [3, 11, 12, 18, 46], 12),
     (2025, 7, 30, [12, 14, 32, 35, 47], 7),
     (2025, 7, 26, [2, 10, 29, 32, 37], 26),
@@ -34,23 +34,25 @@ draw_data = [
 # Convert data to pandas DataFrame
 df = pd.DataFrame(draw_data, columns=['Year', 'Month', 'Day', 'Numbers', 'Mega'])
 
-# Step 1: Calculate gaps
-def calculate_gaps(df):
-    gaps = defaultdict(list)
-    
-    for i, row in df.iterrows():
-        for number in row['Numbers']:
-            gaps[number].append(i)
-    
-    gap_counts = {number: len(indices) for number, indices in gaps.items()}
-    return gap_counts
+# Step 1: Calculate frequency of each number
+number_frequency = defaultdict(int)
+for i, row in df.iterrows():
+    for number in row['Numbers']:
+        number_frequency[number] += 1
 
-# Step 2: Select 10 combos based on gaps and frequency
-gap_counts = calculate_gaps(df)
-frequent_numbers = sorted(gap_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+# Sort numbers by frequency (most common first)
+sorted_number_frequency = sorted(number_frequency.items(), key=lambda x: x[1], reverse=True)
 
-# Display results
-print("Top 10 numbers likely to appear:")
-for number, count in frequent_numbers:
-    print(f"Number: {number}, Occurrences: {count}")
+# Step 2: Generate 10 random combinations based on frequent numbers
+# Taking the top 20 most common numbers to generate the combinations
+top_20_numbers = [num for num, freq in sorted_number_frequency[:20]]
 
+# Generate 10 random combos from the top 20 frequent numbers
+combos = []
+for _ in range(10):
+    combo = random.sample(top_20_numbers, 5)  # Pick 5 unique numbers
+    combos.append(sorted(combo))
+
+# Output the combinations
+for combo in combos:
+    print(combo)
